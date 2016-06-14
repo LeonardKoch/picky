@@ -49,21 +49,62 @@ const getWeekday = (day, month, year) => {
     return d;
 }
 
-console.log(getWeekday(1, 3, 2016));
-/*
-const getWeekday = (day, month, year) => {
-    const monthValues = [6, 2, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4,]
+const getFollowingMonthNumber = (month) => {
+    if (month === 12) {
+        return 1;
+    } else {
+        return month + 1;
+    }
+};
+
+const getPrecedingMonthNumber = (month) => {
+    if (month === 1) {
+        return 12;
+    } else {
+        return month - 1;
+    }
+};
+
+const getDaysInMonth = (month, year) => {
+    const monthLengths = [
+        31,
+        isLeapYear(year) ? 29 : 28,
+        31,
+        30,
+        31,
+        30,
+        31,
+        31,
+        30,
+        31,
+        30,
+        31
+    ];
+    return monthLengths[month-1];
 }
-/*
+
+
 const generateMonth = (month, year) => {
-    const startWeekday =
+    const startWeekday = getWeekday(1, month, year);
+
+    const precedingMonth = getPrecedingMonthNumber(month);
+    const daysInPrecedingMonth = getDaysInMonth(precedingMonth, year);
+    const followingMonth = getFollowingMonthNumber(month);
 
     const weeks = [];
-    weeks.
 
-    return
-}
-*/
-const generateViewData = (data) => {
+    let currentDate = 1;
+    let currentWeek = 0;
 
-}
+    weeks[0] = [];
+
+    for (var i = 0; i < startWeekday; i++) {
+        weeks[0].push(daysInPrecedingMonth - (startWeekday-1) + i)
+    }
+    console.log(daysInPrecedingMonth);
+    console.log(startWeekday);
+    console.log(weeks);
+    return weeks;
+};
+
+generateMonth(6, 2016);
