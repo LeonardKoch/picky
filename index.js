@@ -45,7 +45,7 @@ const getWeekday = (day, month, year) => {
 
     const h = (q + Math.floor(13*(m + 1) / 5) + K + Math.floor(K/4) + Math.floor(J/4) + 5*J) % 7;
 
-    const d = ((h+5) % 7) + 1;
+    const d = ((h+5) % 7);
     return d;
 }
 
@@ -72,13 +72,23 @@ const getDaysInMonth = (month, year) => {
     return monthLengths[month-1];
 }
 
+const createDayObject = (day, weekday, month, year) => {
+    return {
+        day, weekday, month, year
+    };
+}
 
-const generateMonth = (month, year) => {
+
+const generateMonthViewData = (month, year) => {
     const startWeekday = getWeekday(1, month, year);
 
     const precedingMonth = getPrecedingMonthNumber(month);
+    const yearOfPrecedingMonth = precedingMonth === 12 ? year-1 : year;
     const daysInPrecedingMonth = getDaysInMonth(precedingMonth, year);
+
     const followingMonth = getFollowingMonthNumber(month);
+    const yearOfFollowingMonth = followingMonth === 1 ? year+1 : year;
+
 
     const daysInCurrentMonth = getDaysInMonth(month, year);
 
@@ -86,11 +96,17 @@ const generateMonth = (month, year) => {
 
     let currentDate = 1;
     let currentWeekIndex = 0;
+    let currentDayInFollowingMonth = 1;
 
     weeks[currentWeekIndex] = [];
 
     for (var i = 0; i < startWeekday; i++) {
-        weeks[currentWeekIndex].push(daysInPrecedingMonth - (startWeekday-1) + i)
+        weeks[currentWeekIndex].push(createDayObject(
+            daysInPrecedingMonth - startWeekday + 1 + i,
+            i,
+            precedingMonth,
+            yearOfPrecedingMonth
+        ));
     }
     while(weeks[currentWeekIndex].length < 7 || currentDate <= daysInCurrentMonth) {
         if(weeks[currentWeekIndex].length === 7) {
@@ -98,19 +114,27 @@ const generateMonth = (month, year) => {
             weeks[currentWeekIndex] = [];
         }
         if(currentDate <= daysInCurrentMonth) {
-            weeks[currentWeekIndex].push(currentDate);
+            weeks[currentWeekIndex].push(createDayObject(
+                currentDate,
+                weeks[currentWeekIndex].length+1,
+                month,
+                year
+            ));
             currentDate++;
         } else {
-            weeks[currentWeekIndex].push(500);
+            weeks[currentWeekIndex].push(createDayObject(
+                currentDayInFollowingMonth,
+                weeks[currentWeekIndex].length+1,
+                followingMonth,
+                yearOfFollowingMonth
+            ));
+            currentDayInFollowingMonth++;
         }
     }
-    console.log(daysInPrecedingMonth);
-    console.log(startWeekday);
-    console.log(weeks);
     return weeks;
 };
 
-generateMonth(8, 2016);
+console.log(generateMonth(11, 2016));
 
 
 
