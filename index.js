@@ -67,18 +67,7 @@ const getPrecedingMonthNumber = (month) => {
 
 const getDaysInMonth = (month, year) => {
     const monthLengths = [
-        31,
-        isLeapYear(year) ? 29 : 28,
-        31,
-        30,
-        31,
-        30,
-        31,
-        31,
-        30,
-        31,
-        30,
-        31
+        31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
     ];
     return monthLengths[month-1];
 }
@@ -91,15 +80,29 @@ const generateMonth = (month, year) => {
     const daysInPrecedingMonth = getDaysInMonth(precedingMonth, year);
     const followingMonth = getFollowingMonthNumber(month);
 
+    const daysInCurrentMonth = getDaysInMonth(month, year);
+
     const weeks = [];
 
     let currentDate = 1;
-    let currentWeek = 0;
+    let currentWeekIndex = 0;
 
-    weeks[0] = [];
+    weeks[currentWeekIndex] = [];
 
     for (var i = 0; i < startWeekday; i++) {
-        weeks[0].push(daysInPrecedingMonth - (startWeekday-1) + i)
+        weeks[currentWeekIndex].push(daysInPrecedingMonth - (startWeekday-1) + i)
+    }
+    while(weeks[currentWeekIndex].length < 7 || currentDate <= daysInCurrentMonth) {
+        if(weeks[currentWeekIndex].length === 7) {
+            currentWeekIndex++;
+            weeks[currentWeekIndex] = [];
+        }
+        if(currentDate <= daysInCurrentMonth) {
+            weeks[currentWeekIndex].push(currentDate);
+            currentDate++;
+        } else {
+            weeks[currentWeekIndex].push(500);
+        }
     }
     console.log(daysInPrecedingMonth);
     console.log(startWeekday);
@@ -107,4 +110,37 @@ const generateMonth = (month, year) => {
     return weeks;
 };
 
-generateMonth(6, 2016);
+generateMonth(8, 2016);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
