@@ -1,13 +1,27 @@
+'use strict';
+
 const currentDate = new Date();
 const viewDataHelpers = require('./viewDataHelpers');
 
-const datePickerData = {
-
-};
-
 class picky {
+
+    static addCalendar(state, name, startMonth, startYear) {
+        return {
+            ...state,
+            calendars: [
+                ...state.calendars,
+                {
+                    name: name,
+                    month: startMonth,
+                    year: startYear
+                }
+            ]
+        };
+    }
+
     static generateDatePicker() {
         return {
+            calendars: [],
             viewMode: 'month',
             view: {
                 year: 2016,
@@ -21,43 +35,10 @@ class picky {
             }
         };
     }
-
 }
 
+const datePickerData = picky.generateDatePicker();
+console.log(datePickerData);
 
-
-console.log(viewDataHelpers.generateMonthViewData(11, 2016));
-//console.log(generateMonthViewData(11, 2016));
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+const modifiedDatePickerData = picky.addCalendar(datePickerData, 'left', 10, 2015);
+console.log(modifiedDatePickerData);

@@ -1,3 +1,5 @@
+"use strict";
+
 class util {
     static isLeapYear(year) {
         if (year%4 !== 0) {
