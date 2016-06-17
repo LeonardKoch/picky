@@ -12,8 +12,8 @@ const createBundle = (appBundler) => {
         .transform('babelify')// Get settings from ".babelrc"
         .bundle()
         .on('error', gutil.log)
-        .pipe(source('script.js'))
-        .pipe(gulp.dest('./build'));
+        .pipe(source('picky.js'))
+        .pipe(gulp.dest('./dist'));
 };
 
 gulp.task('default', () => {
