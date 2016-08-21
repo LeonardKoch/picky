@@ -2,8 +2,9 @@
   "name": "date-picky",
   "version": "1.0.0",
   "description": "An API for date picker functionality. ",
-  "main": "index.js",
+  "main": "lib/picky.js",
   "scripts": {
+    "start": "babel -d lib src/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -14,6 +15,7 @@
   "license": "ISC",
   "homepage": "https://bitbucket.org/LeonardKoch/date-picky#readme",
   "devDependencies": {
+    "babel-cli": "^6.11.4",
     "babel-plugin-transform-object-rest-spread": "^6.8.0",
     "babel-preset-es2015": "^6.9.0",
     "babelify": "^7.3.0",
