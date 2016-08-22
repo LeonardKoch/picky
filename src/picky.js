@@ -344,7 +344,7 @@ class picky {
         if (picky.isValidPicky(state)) {
             const calendar = state.calendars[name];
             if (calendar) {
-                return viewDataHelpers.generateMonthViewData(calendar.view.month, calendar.view.year, null);
+                return viewDataHelpers.generateMonthViewData(calendar.view.month, calendar.view.year, null, [calendar.selection]);
             } else {
                 console.warn(`There is no calendar with the name: ${name} in this picky object.`);
                 return null;

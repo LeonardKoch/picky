@@ -4,13 +4,15 @@ import util from './util';
 
 class viewDataHelpers {
 
-    static createDayObject(day, weekday, month, year, constraints) {
+    static createDayObject(day, weekday, month, year, constraints, selections) {
 
         const dayObj = {
             day, weekday, month, year
         };
 
-        viewDataHelpers.getDateComparatives()
+        dayObj.isSelected = viewDataHelpers.isDateInDateList(dayObj, selections);
+
+        //viewDataHelpers.getDateComparatives()
 
         return dayObj;
     }
@@ -33,7 +35,11 @@ class viewDataHelpers {
         // return
     }
 
-    static generateMonthViewData(month, year, constraints) {
+    static isDateInDateList(date, dateList) {
+        return dateList.some((currentDate) => util.aEqualToB(date, currentDate));
+    }
+
+    static generateMonthViewData(month, year, constraints, selections) {
         const startWeekday = util.getWeekday(1, month, year);
 
         const precedingMonth = util.getPrecedingMonthNumber(month);
@@ -59,7 +65,8 @@ class viewDataHelpers {
                 i,
                 precedingMonth,
                 yearOfPrecedingMonth,
-                constraints
+                constraints,
+                selections
             ));
         }
         while(weeks[currentWeekIndex].length < 7 || currentDate <= daysInCurrentMonth) {
@@ -73,7 +80,8 @@ class viewDataHelpers {
                     weeks[currentWeekIndex].length+1,
                     month,
                     year,
-                    constraints
+                    constraints,
+                    selections
                 ));
                 currentDate++;
             } else {
@@ -82,7 +90,8 @@ class viewDataHelpers {
                     weeks[currentWeekIndex].length+1,
                     followingMonth,
                     yearOfFollowingMonth,
-                    constraints
+                    constraints,
+                    selections
                 ));
                 currentDayInFollowingMonth++;
             }

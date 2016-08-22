@@ -13,6 +13,11 @@ class util {
         }
     }
 
+    static aEqualToB(a, b) {
+        return a.year === b.year && a.month === b.month && a.day === b.day;
+    }
+
+
     static aBeforeB(a, b) {
         return a.year < b.year
             || a.year === b.year && a.month < b.month
