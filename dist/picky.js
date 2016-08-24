@@ -167,57 +167,20 @@ function generateMonthViewData(month, year, constraints, selections) {
     };
 }
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-  return typeof obj;
-} : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
-};
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
-var defineProperty = function (obj, key, value) {
-  if (key in obj) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-  return obj;
-};
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
-var _extends = Object.assign || function (target) {
-  for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i];
-
-    for (var key in source) {
-      if (Object.prototype.hasOwnProperty.call(source, key)) {
-        target[key] = source[key];
-      }
-    }
-  }
-
-  return target;
-};
-
-var toConsumableArray = function (arr) {
-  if (Array.isArray(arr)) {
-    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
-
-    return arr2;
-  } else {
-    return Array.from(arr);
-  }
-};
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function addCalendar(state, name, startDay, startMonth, startYear) {
     if (isValidPicky(state)) {
         var currentDate = new Date();
 
         return _extends({}, state, {
-            calendars: _extends({}, state.calendars, defineProperty({}, name, {
+            calendars: _extends({}, state.calendars, _defineProperty({}, name, {
                 name: name,
                 view: {
                     year: startYear || currentDate.getFullYear(),
@@ -296,7 +259,7 @@ function addDateConstraint(state, agentCalendarName, agentProperty, date) {
 function addConstraint(state, constraint) {
     if (isValidPicky(state)) {
         return _extends({}, state, {
-            constraints: [].concat(toConsumableArray(state.constraints), [constraint])
+            constraints: [].concat(_toConsumableArray(state.constraints), [constraint])
         });
     } else {
         return state;
@@ -306,7 +269,7 @@ function addConstraint(state, constraint) {
 function setCalendar(state, name, calendar) {
     if (isValidPicky(state)) {
         return _extends({}, state, {
-            calendars: _extends({}, state.calendars, defineProperty({}, name, calendar))
+            calendars: _extends({}, state.calendars, _defineProperty({}, name, calendar))
         });
     } else {
         return state;
