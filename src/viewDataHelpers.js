@@ -1,107 +1,109 @@
 "use strict";
 
-import util from './util';
+import {
+    isLeapYear,
+    aEqualToB,
+    getWeekday,
+    getPrecedingMonthNumber,
+    getDaysInMonth,
+    getFollowingMonthNumber,
+} from './util';
 
-class viewDataHelpers {
+export function createDayObject(day, weekday, month, year, constraints, selections) {
 
-    static createDayObject(day, weekday, month, year, constraints, selections) {
+    const dayObj = {
+        day, weekday, month, year
+    };
 
-        const dayObj = {
-            day, weekday, month, year
-        };
+    dayObj.isSelected = isDateInDateList(dayObj, selections);
 
-        dayObj.isSelected = viewDataHelpers.isDateInDateList(dayObj, selections);
+    //getDateComparatives()
 
-        //viewDataHelpers.getDateComparatives()
+    return dayObj;
+}
 
-        return dayObj;
+export function generateYearViewData(year) {
+    const isLeapYear = isLeapYear(year);
+    return {
+        year: year,
+        isLeapYear: isLeapYear,
+        numberOfDays: isLeapYear ? 366 : 365,
+        months: (new Array(12))
+            .fill(0)
+            .map((value, index) => index + 1)
+            .map((monthNumber) => generateMonthViewData(monthNumber, year))
+    };
+}
+
+export function getDateComparatives(date, constraints) {
+    // Implement stuff from checkConstraintViolation
+    // return
+}
+
+export function isDateInDateList(date, dateList) {
+    return dateList.some((currentDate) => aEqualToB(date, currentDate));
+}
+
+export function generateMonthViewData(month, year, constraints, selections) {
+    const startWeekday = getWeekday(1, month, year);
+
+    const precedingMonth = getPrecedingMonthNumber(month);
+    const yearOfPrecedingMonth = precedingMonth === 12 ? year - 1 : year;
+    const daysInPrecedingMonth = getDaysInMonth(precedingMonth, year);
+
+    const followingMonth = getFollowingMonthNumber(month);
+    const yearOfFollowingMonth = followingMonth === 1 ? year + 1 : year;
+
+    const daysInCurrentMonth = getDaysInMonth(month, year);
+
+    const weeks = [];
+
+    let currentDate = 1;
+    let currentWeekIndex = 0;
+    let currentDayInFollowingMonth = 1;
+
+    weeks[currentWeekIndex] = [];
+
+    for (var i = 0; i < startWeekday; i++) {
+        weeks[currentWeekIndex].push(createDayObject(
+            daysInPrecedingMonth - startWeekday + 1 + i,
+            i,
+            precedingMonth,
+            yearOfPrecedingMonth,
+            constraints,
+            selections
+        ));
     }
-
-    static generateYearViewData(year) {
-        const isLeapYear = util.isLeapYear(year);
-        return {
-            year: year,
-            isLeapYear: isLeapYear,
-            numberOfDays: isLeapYear ? 366: 365,
-            months: (new Array(12))
-                    .fill(0)
-                    .map((value, index) => index+1)
-                    .map((monthNumber)  => viewDataHelpers.generateMonthViewData(monthNumber, year))
-        };
-    }
-
-    static getDateComparatives(date, constraints) {
-        // Implement stuff from checkConstraintViolation
-        // return
-    }
-
-    static isDateInDateList(date, dateList) {
-        return dateList.some((currentDate) => util.aEqualToB(date, currentDate));
-    }
-
-    static generateMonthViewData(month, year, constraints, selections) {
-        const startWeekday = util.getWeekday(1, month, year);
-
-        const precedingMonth = util.getPrecedingMonthNumber(month);
-        const yearOfPrecedingMonth = precedingMonth === 12 ? year-1 : year;
-        const daysInPrecedingMonth = util.getDaysInMonth(precedingMonth, year);
-
-        const followingMonth = util.getFollowingMonthNumber(month);
-        const yearOfFollowingMonth = followingMonth === 1 ? year+1 : year;
-
-        const daysInCurrentMonth = util.getDaysInMonth(month, year);
-
-        const weeks = [];
-
-        let currentDate = 1;
-        let currentWeekIndex = 0;
-        let currentDayInFollowingMonth = 1;
-
-        weeks[currentWeekIndex] = [];
-
-        for (var i = 0; i < startWeekday; i++) {
-            weeks[currentWeekIndex].push(viewDataHelpers.createDayObject(
-                daysInPrecedingMonth - startWeekday + 1 + i,
-                i,
-                precedingMonth,
-                yearOfPrecedingMonth,
+    while (weeks[currentWeekIndex].length < 7 || currentDate <= daysInCurrentMonth) {
+        if (weeks[currentWeekIndex].length === 7) {
+            currentWeekIndex++;
+            weeks[currentWeekIndex] = [];
+        }
+        if (currentDate <= daysInCurrentMonth) {
+            weeks[currentWeekIndex].push(createDayObject(
+                currentDate,
+                weeks[currentWeekIndex].length + 1,
+                month,
+                year,
                 constraints,
                 selections
             ));
+            currentDate++;
+        } else {
+            weeks[currentWeekIndex].push(createDayObject(
+                currentDayInFollowingMonth,
+                weeks[currentWeekIndex].length + 1,
+                followingMonth,
+                yearOfFollowingMonth,
+                constraints,
+                selections
+            ));
+            currentDayInFollowingMonth++;
         }
-        while(weeks[currentWeekIndex].length < 7 || currentDate <= daysInCurrentMonth) {
-            if(weeks[currentWeekIndex].length === 7) {
-                currentWeekIndex++;
-                weeks[currentWeekIndex] = [];
-            }
-            if(currentDate <= daysInCurrentMonth) {
-                weeks[currentWeekIndex].push(viewDataHelpers.createDayObject(
-                    currentDate,
-                    weeks[currentWeekIndex].length+1,
-                    month,
-                    year,
-                    constraints,
-                    selections
-                ));
-                currentDate++;
-            } else {
-                weeks[currentWeekIndex].push(viewDataHelpers.createDayObject(
-                    currentDayInFollowingMonth,
-                    weeks[currentWeekIndex].length+1,
-                    followingMonth,
-                    yearOfFollowingMonth,
-                    constraints,
-                    selections
-                ));
-                currentDayInFollowingMonth++;
-            }
-        }
-        return {
-            month: month,
-            year: year,
-            weeks: weeks,
-        };
     }
+    return {
+        month: month,
+        year: year,
+        weeks: weeks,
+    };
 }
-
-module.exports = viewDataHelpers;
