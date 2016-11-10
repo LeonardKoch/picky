@@ -131,6 +131,20 @@ function getInBetweenFlags(date, calendars) {
     }, {});
 }
 
+function getBeforeFlags(date, calendars) {
+    return calendars.reduce(function (isBefore, calendar) {
+        isBefore[calendar.name] = aBeforeB(date, calendar.selection);
+        return isBefore;
+    }, {});
+}
+
+function getAfterFlags(date, calendars) {
+    return calendars.reduce(function (isAfter, calendar) {
+        isAfter[calendar.name] = aAfterB(date, calendar.selection);
+        return isAfter;
+    }, {});
+}
+
 function enrichViewDataWithSelections(viewData, pickyData) {
     var calendars = Object.keys(pickyData.calendars).map(function (calendarName) {
         return pickyData.calendars[calendarName];
@@ -141,6 +155,8 @@ function enrichViewDataWithSelections(viewData, pickyData) {
     return transformDay(viewData, function (dayObj) {
         dayObj.isSelected = isDateInDateList(dayObj, selections);
         dayObj.inBetween = getInBetweenFlags(dayObj, calendars);
+        dayObj.isBefore = getBeforeFlags(dayObj, calendars);
+        dayObj.isAfter = getAfterFlags(dayObj, calendars);
         return dayObj;
     });
 }

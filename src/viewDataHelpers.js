@@ -7,7 +7,9 @@ import {
     getPrecedingMonthNumber,
     getDaysInMonth,
     getFollowingMonthNumber,
-    aBetweenBAndC
+    aBetweenBAndC,
+    aBeforeB,
+    aAfterB
 } from './util';
 
 export function createDayObject(day, weekday, month, year) {
@@ -41,12 +43,28 @@ export function getInBetweenFlags(date, calendars) {
     }, {});
 }
 
+export function getBeforeFlags(date, calendars) {
+    return calendars.reduce((isBefore, calendar) => {
+        isBefore[calendar.name] = aBeforeB(date, calendar.selection);
+        return isBefore;
+    }, {});
+}
+
+export function getAfterFlags(date, calendars) {
+    return calendars.reduce((isAfter, calendar) => {
+        isAfter[calendar.name] = aAfterB(date, calendar.selection);
+        return isAfter;
+    }, {});
+}
+
 export function enrichViewDataWithSelections(viewData, pickyData) {
     const calendars = Object.keys(pickyData.calendars).map(calendarName => pickyData.calendars[calendarName]);
     const selections = calendars.map(calendar => calendar.selection);
     return transformDay(viewData, (dayObj) => {
         dayObj.isSelected = isDateInDateList(dayObj, selections);
         dayObj.inBetween = getInBetweenFlags(dayObj, calendars);
+        dayObj.isBefore = getBeforeFlags(dayObj, calendars);
+        dayObj.isAfter = getAfterFlags(dayObj, calendars);
         return dayObj;
     });
 }
