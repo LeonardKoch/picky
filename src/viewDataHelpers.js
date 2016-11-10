@@ -7,19 +7,13 @@ import {
     getPrecedingMonthNumber,
     getDaysInMonth,
     getFollowingMonthNumber,
+    aBetweenBAndC
 } from './util';
 
-export function createDayObject(day, weekday, month, year, constraints, selections) {
-
-    const dayObj = {
+export function createDayObject(day, weekday, month, year) {
+    return {
         day, weekday, month, year
     };
-
-    dayObj.isSelected = isDateInDateList(dayObj, selections);
-
-    //getDateComparatives()
-
-    return dayObj;
 }
 
 export function generateYearViewData(year) {
@@ -35,16 +29,33 @@ export function generateYearViewData(year) {
     };
 }
 
-export function getDateComparatives(date, constraints) {
-    // Implement stuff from checkConstraintViolation
-    // return
+export function getInBetweenFlags(date, calendars) {
+    return calendars.reduce((inBetween, calendar) => {
+        inBetween[calendar.name] = {};
+        calendars.filter(cal => cal.name != calendar.name).forEach((nestedCalendar) => {
+            const isInBetween = aBetweenBAndC(date, calendar.selection, nestedCalendar.selection);
+            inBetween[calendar.name][nestedCalendar.name] = isInBetween;
+            inBetween.any = inBetween.any || isInBetween;
+        });
+        return inBetween;
+    }, {});
+}
+
+export function enrichViewDataWithSelections(viewData, pickyData) {
+    const calendars = Object.keys(pickyData.calendars).map(calendarName => pickyData.calendars[calendarName]);
+    const selections = calendars.map(calendar => calendar.selection);
+    return transformDay(viewData, (dayObj) => {
+        dayObj.isSelected = isDateInDateList(dayObj, selections);
+        dayObj.inBetween = getInBetweenFlags(dayObj, calendars);
+        return dayObj;
+    });
 }
 
 export function isDateInDateList(date, dateList) {
     return dateList.some((currentDate) => aEqualToB(date, currentDate));
 }
 
-export function generateMonthViewData(month, year, constraints, selections) {
+export function generateMonthViewData(month, year, constraints, calendars) {
     const startWeekday = getWeekday(1, month, year);
 
     const precedingMonth = getPrecedingMonthNumber(month);
@@ -69,9 +80,7 @@ export function generateMonthViewData(month, year, constraints, selections) {
             daysInPrecedingMonth - startWeekday + 1 + i,
             i,
             precedingMonth,
-            yearOfPrecedingMonth,
-            constraints,
-            selections
+            yearOfPrecedingMonth
         ));
     }
     while (weeks[currentWeekIndex].length < 7 || currentDate <= daysInCurrentMonth) {
@@ -84,9 +93,7 @@ export function generateMonthViewData(month, year, constraints, selections) {
                 currentDate,
                 weeks[currentWeekIndex].length + 1,
                 month,
-                year,
-                constraints,
-                selections
+                year
             ));
             currentDate++;
         } else {
@@ -94,9 +101,7 @@ export function generateMonthViewData(month, year, constraints, selections) {
                 currentDayInFollowingMonth,
                 weeks[currentWeekIndex].length + 1,
                 followingMonth,
-                yearOfFollowingMonth,
-                constraints,
-                selections
+                yearOfFollowingMonth
             ));
             currentDayInFollowingMonth++;
         }
@@ -105,5 +110,12 @@ export function generateMonthViewData(month, year, constraints, selections) {
         month: month,
         year: year,
         weeks: weeks,
+    };
+}
+
+export function transformDay(viewData, transformFunction) {
+    return {
+        ...viewData,
+        weeks: viewData.weeks.map(week => week.map(day => transformFunction(day, viewData.month, viewData.year)))
     };
 }

@@ -3,6 +3,7 @@
 import {
     generateMonthViewData,
     generateYearViewData,
+    enrichViewDataWithSelections
 } from './viewDataHelpers';
 
 import {
@@ -352,7 +353,10 @@ export function getCalendarViewData(state, name) {
     if (isValidPicky(state)) {
         const calendar = state.calendars[name];
         if (calendar) {
-            return generateMonthViewData(calendar.view.month, calendar.view.year, null, [calendar.selection]);
+            return enrichViewDataWithSelections(
+                generateMonthViewData(calendar.view.month, calendar.view.year, null, state.calendars),
+                state
+            );
         } else {
             console.warn(`There is no calendar with the name: ${name} in this picky object.`);
             return null;

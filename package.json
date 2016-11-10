@@ -8,7 +8,7 @@
     "start": "npm run build:main && npm run build:browser",
     "build:main": "NODE_ENV=main rollup -c",
     "build:browser": "NODE_ENV=browser rollup -c",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -18,9 +18,25 @@
   "license": "ISC",
   "homepage": "https://bitbucket.org/LeonardKoch/date-picky#readme",
   "devDependencies": {
+    "jest-cli": "^0.10.0",
+    "babel-cli": "^6.0.0",
     "babel-plugin-transform-object-rest-spread": "^6.8.0",
     "babel-preset-es2015": "^6.13.2",
     "rollup": "^0.34.10",
-    "rollup-plugin-babel": "^2.6.1"
+    "rollup-plugin-babel": "^2.6.1",
+    "babel-jest": "^15.0.0"
+  },
+  "jest": {
+    "rootDir": "./",
+    "automock": false,
+    "scriptPreprocessor": "node_modules/babel-jest",
+    "testDirectoryName": "test",
+    "testFileExtensions": [
+      "spec.js"
+    ],
+    "moduleFileExtensions": [
+      "js"
+    ],
+    "collectCoverage": false
   }
 }

@@ -29,6 +29,10 @@ export function aAfterB(a, b) {
         || a.year === b.year && a.month === b.month && a.day > b.day;
 }
 
+export function aBetweenBAndC(a, b, c) {
+    return (aAfterB(a, b) && aBeforeB(a, c)) || (aBeforeB(a, b) && aAfterB(a, c));
+}
+
 
 export function getWeekday(day, month, year) {
     // Implementing Zeller's congruence
