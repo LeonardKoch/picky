@@ -4,6 +4,12 @@
   "description": "An API for date picker functionality. ",
   "main": "lib/picky.js",
   "main:next": "src/picky.js",
+  "contributors": [
+    {
+      "name": "Leonard Koch",
+      "email": "l.koch@mytaxi.com"
+    }
+  ],
   "scripts": {
     "start": "npm run build:main && npm run build:browser",
     "build:main": "NODE_ENV=main rollup -c",
