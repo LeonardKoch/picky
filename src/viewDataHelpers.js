@@ -1,5 +1,3 @@
-"use strict";
-
 import {
     isLeapYear,
     aEqualToB,
@@ -12,29 +10,23 @@ import {
     aAfterB
 } from './util';
 
+export function transformDay(viewData, transformFunction) {
+    return {
+        ...viewData,
+        weeks: viewData.weeks.map(week => week.map(day => transformFunction(day, viewData.month, viewData.year)))
+    };
+}
+
 export function createDayObject(day, weekday, month, year) {
     return {
         day, weekday, month, year
     };
 }
 
-export function generateYearViewData(year) {
-    const isLeapYear = isLeapYear(year);
-    return {
-        year: year,
-        isLeapYear: isLeapYear,
-        numberOfDays: isLeapYear ? 366 : 365,
-        months: (new Array(12))
-            .fill(0)
-            .map((value, index) => index + 1)
-            .map((monthNumber) => generateMonthViewData(monthNumber, year))
-    };
-}
-
 export function getInBetweenFlags(date, calendars) {
     return calendars.reduce((inBetween, calendar) => {
         inBetween[calendar.name] = {};
-        calendars.filter(cal => cal.name != calendar.name).forEach((nestedCalendar) => {
+        calendars.filter(cal => cal.name !== calendar.name).forEach((nestedCalendar) => {
             const isInBetween = aBetweenBAndC(date, calendar.selection, nestedCalendar.selection);
             inBetween[calendar.name][nestedCalendar.name] = isInBetween;
             inBetween.any = inBetween.any || isInBetween;
@@ -57,11 +49,24 @@ export function getAfterFlags(date, calendars) {
     }, {});
 }
 
+export function getSelectionFlags(date, calendars) {
+    return calendars.reduce((isSelectedBy, calendar) => {
+        isSelectedBy[calendar.name] = aEqualToB(date, calendar.selection);
+        return isSelectedBy;
+    }, {});
+}
+
+
+export function isDateInDateList(date, dateList) {
+    return dateList.some((currentDate) => aEqualToB(date, currentDate));
+}
+
 export function enrichViewDataWithSelections(viewData, pickyData) {
     const calendars = Object.keys(pickyData.calendars).map(calendarName => pickyData.calendars[calendarName]);
     const selections = calendars.map(calendar => calendar.selection);
     return transformDay(viewData, (dayObj) => {
         dayObj.isSelected = isDateInDateList(dayObj, selections);
+        dayObj.isSelectedBy = getSelectionFlags(dayObj, calendars);
         dayObj.inBetween = getInBetweenFlags(dayObj, calendars);
         dayObj.isBefore = getBeforeFlags(dayObj, calendars);
         dayObj.isAfter = getAfterFlags(dayObj, calendars);
@@ -69,11 +74,7 @@ export function enrichViewDataWithSelections(viewData, pickyData) {
     });
 }
 
-export function isDateInDateList(date, dateList) {
-    return dateList.some((currentDate) => aEqualToB(date, currentDate));
-}
-
-export function generateMonthViewData(month, year, constraints, calendars) {
+export function generateMonthViewData(month, year) {
     const startWeekday = getWeekday(1, month, year);
 
     const precedingMonth = getPrecedingMonthNumber(month);
@@ -93,9 +94,9 @@ export function generateMonthViewData(month, year, constraints, calendars) {
 
     weeks[currentWeekIndex] = [];
 
-    for (var i = 0; i < startWeekday; i++) {
+    for (let i = 0; i < startWeekday; i += 1) {
         weeks[currentWeekIndex].push(createDayObject(
-            daysInPrecedingMonth - startWeekday + 1 + i,
+            (daysInPrecedingMonth - startWeekday) + 1 + i,
             i,
             precedingMonth,
             yearOfPrecedingMonth
@@ -103,7 +104,7 @@ export function generateMonthViewData(month, year, constraints, calendars) {
     }
     while (weeks[currentWeekIndex].length < 7 || currentDate <= daysInCurrentMonth) {
         if (weeks[currentWeekIndex].length === 7) {
-            currentWeekIndex++;
+            currentWeekIndex += 1;
             weeks[currentWeekIndex] = [];
         }
         if (currentDate <= daysInCurrentMonth) {
@@ -113,7 +114,7 @@ export function generateMonthViewData(month, year, constraints, calendars) {
                 month,
                 year
             ));
-            currentDate++;
+            currentDate += 1;
         } else {
             weeks[currentWeekIndex].push(createDayObject(
                 currentDayInFollowingMonth,
@@ -121,19 +122,25 @@ export function generateMonthViewData(month, year, constraints, calendars) {
                 followingMonth,
                 yearOfFollowingMonth
             ));
-            currentDayInFollowingMonth++;
+            currentDayInFollowingMonth += 1;
         }
     }
     return {
-        month: month,
-        year: year,
-        weeks: weeks,
+        month,
+        year,
+        weeks
     };
 }
 
-export function transformDay(viewData, transformFunction) {
+export function generateYearViewData(year) {
+    const currentYearIsLeapYear = isLeapYear(year);
     return {
-        ...viewData,
-        weeks: viewData.weeks.map(week => week.map(day => transformFunction(day, viewData.month, viewData.year)))
+        year,
+        isLeapYear: currentYearIsLeapYear,
+        numberOfDays: currentYearIsLeapYear ? 366 : 365,
+        months: (new Array(12))
+            .fill(0)
+            .map((value, index) => index + 1)
+            .map((monthNumber) => generateMonthViewData(monthNumber, year))
     };
 }

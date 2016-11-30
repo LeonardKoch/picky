@@ -97,23 +97,19 @@ function getDaysInMonth(month, year) {
 
 var _extends$1 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+function transformDay(viewData, transformFunction) {
+    return _extends$1({}, viewData, {
+        weeks: viewData.weeks.map(function (week) {
+            return week.map(function (day) {
+                return transformFunction(day, viewData.month, viewData.year);
+            });
+        })
+    });
+}
+
 function createDayObject(day, weekday, month, year) {
     return {
         day: day, weekday: weekday, month: month, year: year
-    };
-}
-
-function generateYearViewData(year) {
-    var isLeapYear = isLeapYear(year);
-    return {
-        year: year,
-        isLeapYear: isLeapYear,
-        numberOfDays: isLeapYear ? 366 : 365,
-        months: new Array(12).fill(0).map(function (value, index) {
-            return index + 1;
-        }).map(function (monthNumber) {
-            return generateMonthViewData(monthNumber, year);
-        })
     };
 }
 
@@ -121,7 +117,7 @@ function getInBetweenFlags(date, calendars) {
     return calendars.reduce(function (inBetween, calendar) {
         inBetween[calendar.name] = {};
         calendars.filter(function (cal) {
-            return cal.name != calendar.name;
+            return cal.name !== calendar.name;
         }).forEach(function (nestedCalendar) {
             var isInBetween = aBetweenBAndC(date, calendar.selection, nestedCalendar.selection);
             inBetween[calendar.name][nestedCalendar.name] = isInBetween;
@@ -145,6 +141,19 @@ function getAfterFlags(date, calendars) {
     }, {});
 }
 
+function getSelectionFlags(date, calendars) {
+    return calendars.reduce(function (isSelectedBy, calendar) {
+        isSelectedBy[calendar.name] = aEqualToB(date, calendar.selection);
+        return isSelectedBy;
+    }, {});
+}
+
+function isDateInDateList(date, dateList) {
+    return dateList.some(function (currentDate) {
+        return aEqualToB(date, currentDate);
+    });
+}
+
 function enrichViewDataWithSelections(viewData, pickyData) {
     var calendars = Object.keys(pickyData.calendars).map(function (calendarName) {
         return pickyData.calendars[calendarName];
@@ -154,6 +163,7 @@ function enrichViewDataWithSelections(viewData, pickyData) {
     });
     return transformDay(viewData, function (dayObj) {
         dayObj.isSelected = isDateInDateList(dayObj, selections);
+        dayObj.isSelectedBy = getSelectionFlags(dayObj, calendars);
         dayObj.inBetween = getInBetweenFlags(dayObj, calendars);
         dayObj.isBefore = getBeforeFlags(dayObj, calendars);
         dayObj.isAfter = getAfterFlags(dayObj, calendars);
@@ -161,13 +171,7 @@ function enrichViewDataWithSelections(viewData, pickyData) {
     });
 }
 
-function isDateInDateList(date, dateList) {
-    return dateList.some(function (currentDate) {
-        return aEqualToB(date, currentDate);
-    });
-}
-
-function generateMonthViewData(month, year, constraints, calendars) {
+function generateMonthViewData(month, year) {
     var startWeekday = getWeekday(1, month, year);
 
     var precedingMonth = getPrecedingMonthNumber(month);
@@ -187,20 +191,20 @@ function generateMonthViewData(month, year, constraints, calendars) {
 
     weeks[currentWeekIndex] = [];
 
-    for (var i = 0; i < startWeekday; i++) {
+    for (var i = 0; i < startWeekday; i += 1) {
         weeks[currentWeekIndex].push(createDayObject(daysInPrecedingMonth - startWeekday + 1 + i, i, precedingMonth, yearOfPrecedingMonth));
     }
     while (weeks[currentWeekIndex].length < 7 || currentDate <= daysInCurrentMonth) {
         if (weeks[currentWeekIndex].length === 7) {
-            currentWeekIndex++;
+            currentWeekIndex += 1;
             weeks[currentWeekIndex] = [];
         }
         if (currentDate <= daysInCurrentMonth) {
             weeks[currentWeekIndex].push(createDayObject(currentDate, weeks[currentWeekIndex].length + 1, month, year));
-            currentDate++;
+            currentDate += 1;
         } else {
             weeks[currentWeekIndex].push(createDayObject(currentDayInFollowingMonth, weeks[currentWeekIndex].length + 1, followingMonth, yearOfFollowingMonth));
-            currentDayInFollowingMonth++;
+            currentDayInFollowingMonth += 1;
         }
     }
     return {
@@ -210,14 +214,18 @@ function generateMonthViewData(month, year, constraints, calendars) {
     };
 }
 
-function transformDay(viewData, transformFunction) {
-    return _extends$1({}, viewData, {
-        weeks: viewData.weeks.map(function (week) {
-            return week.map(function (day) {
-                return transformFunction(day, viewData.month, viewData.year);
-            });
+function generateYearViewData(year) {
+    var currentYearIsLeapYear = isLeapYear(year);
+    return {
+        year: year,
+        isLeapYear: currentYearIsLeapYear,
+        numberOfDays: currentYearIsLeapYear ? 366 : 365,
+        months: new Array(12).fill(0).map(function (value, index) {
+            return index + 1;
+        }).map(function (monthNumber) {
+            return generateMonthViewData(monthNumber, year);
         })
-    });
+    };
 }
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };

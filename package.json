@@ -1,6 +1,6 @@
 {
   "name": "date-picky",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An API for date picker functionality. ",
   "main": "lib/picky.js",
   "main:next": "src/picky.js",
@@ -18,11 +18,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://LeonardKoch@bitbucket.org/LeonardKoch/date-picky.git"
+    "url": "git+https://github.com/LeonardKoch/picky.git"
   },
   "author": "",
   "license": "ISC",
-  "homepage": "https://bitbucket.org/LeonardKoch/date-picky#readme",
+  "homepage": "https://github.com/LeonardKoch/picky#readme",
   "devDependencies": {
     "jest-cli": "^0.10.0",
     "babel-cli": "^6.0.0",
